@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Adjei’s Walk With Jehovah</title>
+<meta name="theme-color" content="#1f4d3a">
+<meta name="description" content="A personal routine and encouragement app.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--g:#1f4d3a;--gd:#143527;--cream:#f6f1e3;--sage:#e1ebdf;--line:#d9d2bc;--ink:#1d2b24;--gold:#a87b22}
+*{box-sizing:border-box}
+body{margin:0;font:17px/1.55 system-ui,"Segoe UI",Roboto,sans-serif;background:var(--cream);color:var(--ink);padding-bottom:90px}
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;color:var(--gd);line-height:1.25;margin:0 0 .4em}
+h4{font-size:1.02rem;margin:14px 0 2px}
+.top{background:var(--g);color:#fff;padding:calc(env(safe-area-inset-top) + 22px) 20px 26px;border-radius:0 0 28px 28px}
+.top h1{color:#fff;font-size:1.65rem;margin:0}
+.top p{margin:.35em 0 0}
+main{max-width:720px;margin:0 auto;padding:16px}
+section{display:none}
+section.on{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
+.card.soft{background:var(--sage);border-color:#c9d9c6}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.grid .card{margin:0}
+button,.btn{font:inherit;min-height:46px;padding:10px 16px;border-radius:14px;border:0;background:var(--g);color:#fff;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;margin:4px 6px 4px 0;text-align:center}
+.alt{background:var(--sage);color:var(--gd)}
+.danger{background:#f3e3df;color:#7a2a1d}
+input,select,textarea{font:inherit;width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);margin:4px 0 10px}
+textarea{min-height:84px}
+label{font-weight:600;font-size:.95rem}
+.bar{height:12px;background:var(--sage);border-radius:9px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--g);width:0;transition:width .3s}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;margin:0;border-radius:0;background:none;color:var(--ink);flex-direction:column;font-size:.72rem;min-height:60px;padding:6px 2px}
+nav button span{font-size:1.25rem;line-height:1.1}
+nav button[aria-current=true]{color:var(--g);font-weight:700;box-shadow:inset 0 3px 0 var(--g)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.chk{display:flex;gap:12px;align-items:center;padding:8px 0;font-weight:400}
+.chk input{width:24px;height:24px;margin:0;flex:none}
+.muted{color:#52625a;font-size:.92rem}
+.item{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid var(--line);padding:8px 0;flex-wrap:wrap}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--gd);color:#fff;padding:10px 16px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%}
+#toast.on{opacity:1}
+a{color:var(--g)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+<h1>Adjei’s Walk With Jehovah</h1>
+<p id="date"></p>
+<p id="welcome"></p>
+</header>
+<main>
+
+<section id="home" class="on">
+<div class="card soft"><h3>Today’s verse reference</h3><div id="hVerse"></div></div>
+<div class="grid">
+<div class="card"><h3>Daily Text</h3><p class="muted">The official text is on JW.org. This app does not copy it.</p><a class="btn" id="dtLink" href="https://www.jw.org/en/library/bible/nwt/books/" target="_blank" rel="noopener">Open today’s Daily Text on JW.org</a></div>
+<div class="card"><h3>Bible Reading</h3><p id="hBible"></p><button data-go="bible">Open reading plan</button></div>
+<div class="card"><h3>Encouragement</h3><p id="hEnc"></p><button data-go="enc">More encouragement</button></div>
+<div class="card"><h3>Ministry Schedule</h3><p id="hMin"></p><button data-go="min">Open planner</button></div>
+<div class="card"><h3>Meetings</h3><p>Prepare with notes and official JW.org resources.</p><button data-go="more">Meeting preparation</button></div>
+<div class="card"><h3>Prayer</h3><p id="hPray"></p></div>
+<div class="card"><h3>Progress</h3><div class="bar"><i id="hBar"></i></div><p id="hProg"></p><button data-go="prog">Open checklist</button></div>
+</div>
+</section>
+
+<section id="bible">
+<div class="card"><h2 id="bTitle"></h2><h3 id="bRef"></h3>
+<p><b>Think about it:</b> <span id="bQ"></span></p>
+<p><b>Apply it:</b> <span id="bA"></span></p>
+<a class="btn alt" href="https://www.jw.org/en/library/bible/" target="_blank" rel="noopener">Read in the online Bible on JW.org</a>
+<label for="bNote">My note for this day</label>
+<textarea id="bNote" placeholder="One thing I noticed…"></textarea>
+<button id="bSave">Save note</button><button id="bDone" class="alt"></button>
+<div><button id="bPrev" class="alt">Previous day</button><button id="bNext" class="alt">Next day</button></div>
+<p class="muted">Choose any day at your own pace. There is no deadline.</p></div>
+</section>
+
+<section id="enc">
+<div class="card"><h2>Encouragement for today</h2><div id="eBox"></div>
+<a id="eLink" class="btn alt" href="https://www.jw.org/en/library/bible/" target="_blank" rel="noopener">Look up the scripture on JW.org</a>
+<button id="eNext">Give me another encouragement</button>
+<p class="muted">Reflections are original thoughts, not Bible quotations. Please read the wording in your Bible.</p></div>
+</section>
+
+<section id="min">
+<div class="card"><h2>Telephone witnessing planner</h2>
+<p class="muted">The sessions below are only suggestions. Change, delete or add your own. Nothing is arranged until you confirm it.</p>
+<div id="sslist"></div></div>
+<div class="card"><h3 id="fTitle">Add a session</h3>
+<div class="row"><div><label for="fDay">Day</label><select id="fDay"></select></div><div><label for="fTime">Start time</label><input id="fTime" type="time" value="18:00"></div></div>
+<div class="row"><div><label for="fDur">Duration</label><select id="fDur"></select></div><div><label for="fNote">Notes (optional)</label><input id="fNote" maxlength="120"></div></div>
+<button id="fSave">Save session</button><button id="fCancel" class="alt" hidden>Cancel edit</button></div>
+<div class="card"><h3>Preparation checklist</h3><div id="prep"></div></div>
+<div class="card"><h3>After a session</h3>
+<label for="r1">What went well?</label><textarea id="r1" data-k="~r1"></textarea>
+<label for="r2">What did I learn?</label><textarea id="r2" data-k="~r2"></textarea>
+<label for="r3">One thing to improve</label><textarea id="r3" data-k="~r3"></textarea></div>
+<div class="card"><h3>Confirm a session on WhatsApp</h3>
+<label for="wSel">Session</label><select id="wSel"></select>
+<button id="wBtn">Prepare WhatsApp message</button>
+<p class="muted">This opens WhatsApp with a draft. You choose the contact and press send yourself.</p></div>
+</section>
+
+<section id="prog">
+<div class="card"><h2>Today’s progress</h2><div class="bar"><i id="pBar"></i></div><p id="pMsg"></p><div id="pList"></div><p class="muted" id="pWeek"></p></div>
+<div class="card"><h3>Weekly review</h3>
+<label for="w1">Wins this week</label><textarea id="w1" data-k="@w1"></textarea>
+<label for="w2">Challenges</label><textarea id="w2" data-k="@w2"></textarea>
+<label for="w3">One small goal for next week</label><textarea id="w3" data-k="@w3"></textarea></div>
+</section>
+
+<section id="more">
+<div class="card"><h2>Meetings and personal study</h2>
+<p class="muted">Enter your own meeting details. The app does not know your congregation’s schedule.</p>
+<label for="mNote">Meeting preparation notes</label><textarea id="mNote" data-k="meetnotes"></textarea>
+<a class="btn alt" href="https://www.jw.org/en/library/" target="_blank" rel="noopener">Official JW.org library</a>
+<label for="sGoal">My personal study goal</label><input id="sGoal" data-k="sgoal">
+<label for="qIn">Question to research later</label><input id="qIn" maxlength="200"><button id="qAdd">Add question</button><div id="qList"></div></div>
+
+<div class="card"><h2>Reminders</h2>
+<div class="row"><div><label for="t1">Morning Bible reading</label><input type="time" id="t1"></div><div><label for="t2">Midday encouragement</label><input type="time" id="t2"></div>
+<div><label for="t3">Telephone witnessing</label><input type="time" id="t3"></div><div><label for="t4">Evening review</label><input type="time" id="t4"></div></div>
+<button id="remOn">Turn on reminders</button><button id="remTest" class="alt">Send test</button><button id="remOff" class="alt">Turn off</button>
+<p id="remStatus"></p>
+<p class="muted"><b>Limits:</b> reminders only fire while this app is open or still running in the background. Android may pause it to save battery, and closed apps will not notify you. For dependable reminders, also set alarms in your phone’s Clock app at these times.</p></div>
+
+<div class="card"><h2>Share and install</h2>
+<button id="share">Share this app</button>
+<p class="muted">After the app is published, copy its HTTPS link and paste it into a WhatsApp chat. In Chrome on Android, tap the menu (⋮), then “Add to Home screen” or “Install app”.</p></div>
+
+<div class="card"><h2>Privacy</h2>
+<p>Everything is saved only on this device. It does not sync between devices and can be lost if browser data is cleared. There is no tracking or analytics. Please avoid typing names, passwords or congregation records.</p>
+<button id="wipe" class="danger">Erase all my data on this device</button></div>
+</section>
+</main>
+
+<nav aria-label="Main">
+<button data-tab="home"><span>🏠</span>Home</button>
+<button data-tab="bible"><span>📖</span>Bible</button>
+<button data-tab="enc"><span>💚</span>Encourage</button>
+<button data-tab="min"><span>📞</span>Ministry</button>
+<button data-tab="prog"><span>✅</span>Progress</button>
+<button data-tab="more"><span>⋯</span>More</button>
+</nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
+const S={g(k,d){try{const v=localStorage.getItem('wwj_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+s(k,v){try{localStorage.setItem('wwj_'+k,JSON.stringify(v));return true}catch(e){toast('Could not save in this browser.');return false}}};
+const now=new Date(),iso=d=>d.toLocaleDateString('en-CA'),TD=iso(now);
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const dow=(now.getDay()+6)%7;
+const mon=new Date(now);mon.setDate(now.getDate()-dow);const WK=iso(mon);
+
+const MSG=['A new week, and Jehovah is near. Begin gently.','Small steps add up. You are doing well.','Take a breath. Today is a fresh start.','Jehovah values your effort, however small.','Keep going. You are not walking alone.','Rest and rejoice. Today is a gift.','A peaceful day to refresh your heart.'];
+const PRAY='Pray in your own words today. Thank Jehovah for one thing and ask for help with one thing.';
+
+// ref|reflection|action|prayer thought
+const E=`Psalm 23|Jehovah cares for his people like a shepherd who knows each sheep.|Read the psalm slowly and name one way you were cared for this week.|Thank him for his daily care.
+Psalm 34:18|Jehovah draws near when we feel low; he does not turn away from discouraged hearts.|Pray about one heavy feeling in plain words.|Ask for comfort and a calm mind.
+Psalm 46:1|Jehovah is a safe place in hard times.|Write down one worry and hand it over in prayer.|Thank him for being a refuge.
+Psalm 55:22|We are invited to hand over our burdens rather than carry them alone.|Name one burden and pray about it before noon.|Ask for strength to keep going today.
+Psalm 121:1-2|Our help comes from the Creator of heaven and earth.|Step outside for a minute, look at the sky and pray.|Thank him for his power and care.
+Isaiah 41:10|Jehovah promises to strengthen and support those who trust him.|When worry rises today, recall this reference.|Ask for courage for what is ahead.
+Matthew 6:33-34|Putting God’s interests first helps us face today without borrowing tomorrow’s worries.|Choose one spiritual priority and do it first today.|Ask for wisdom to put first things first.
+Luke 11:9-13|Jehovah is a generous Father who gladly answers sincere requests.|Make one specific request in prayer today.|Ask for his holy spirit.
+John 15:9-11|Staying in Jesus’ love brings lasting joy.|Do one small thing today that you know pleases him.|Thank Jehovah for his love.
+Romans 12:11-12|Zeal, joy, endurance and prayer work together.|Pray first, then take one small step in your routine.|Ask for an energetic spirit.
+Galatians 6:9|Good work is never wasted; fruit comes in its season.|Do one good thing quietly today.|Ask for endurance not to give up.
+Philippians 4:6-9|Prayer brings peace, and focusing on good things guards the mind.|Replace one anxious thought with something true and lovely.|Thank him and ask for peace of mind.
+1 Thessalonians 5:11, 14|We are asked to build one another up and to be patient with everyone.|Send a kind message to someone who may need it.|Ask for words that strengthen others.
+Hebrews 10:24-25|Meeting together helps us stir one another to love and fine works.|Prepare one comment or thought for the next meeting.|Thank Jehovah for the congregation.
+Hebrews 6:10|God does not forget our work or the love shown for his name.|Remember one thing you did for others and be at peace.|Thank him for noticing what others miss.
+Psalm 16:8|Keeping Jehovah in view brings steadiness.|Begin one task today by mentioning him in prayer.|Ask to feel his nearness.
+Psalm 37:5|Committing our way to Jehovah means trusting him with the outcome.|Pick one decision to pray over today.|Ask him to guide your steps.
+Psalm 62:8|We can pour out our hearts to him at any time.|Spend three minutes praying honestly, without polishing your words.|Thank him for listening.
+Psalm 94:19|Anxious thoughts can multiply, yet comfort from God calms the soul.|Breathe slowly and pray when a worry returns.|Ask for calm.
+Psalm 119:105|God’s word lights the next step, not necessarily the whole road.|Read a passage and jot down one thing it shows you for today.|Ask for light on a decision.
+Psalm 145:18|Jehovah is near to all who call on him sincerely.|Call on him now, even for one minute.|Thank him for being close.
+Proverbs 3:5-6|Trust works best when we do not lean only on our own understanding.|Write one problem and ask what a godly approach would be.|Ask for direction.
+Proverbs 16:3|Committing plans to Jehovah steadies them.|Look over your week’s plans and pray over them.|Ask him to bless good plans.
+Isaiah 40:29-31|Jehovah renews the strength of the weary.|Rest well today and pace yourself without guilt.|Ask for renewed strength.
+Isaiah 26:3|Peace belongs to a mind that leans on Jehovah.|Sit quietly for one minute and let your mind settle.|Ask for steady peace.
+Matthew 11:28-30|Jesus invites the tired to find refreshment under his gentle direction.|Drop one unnecessary pressure you placed on yourself.|Thank Jehovah for Jesus’ kindness.
+Colossians 3:23|Work done wholeheartedly for Jehovah has meaning.|Do one ordinary chore with a thankful attitude.|Ask for a willing spirit.
+James 4:8|Drawing close to God is met with his drawing close to us.|Take one small step toward him: read, pray or listen.|Thank him for responding.
+1 Peter 5:6-7|Humility and trust go together, and he cares about us.|Name one anxiety and pray about it.|Ask for humility and trust.
+Deuteronomy 31:6|Courage grows from knowing Jehovah does not abandon his people.|Recall a time he helped you and keep it in mind today.|Ask for courage.`.split('\n');
+
+// passage|reflection question|practical application
+const R=`Psalm 23|What shows Jehovah’s care for you?|Thank him for one example today.
+Psalm 34|What does it say about his closeness in hard times?|Pray about one concern.
+Psalm 46|Where do you find safety?|Repeat verse 1 in prayer.
+Psalm 55|What burden can you hand over?|Pray about it today.
+Psalm 121|Why can you trust his help?|Look at the sky and thank him.
+Isaiah 41|What does he promise his people?|Note one fear and one promise.
+Matthew 6|What should come first for you?|Choose one priority.
+Luke 11|What does it teach about prayer?|Make one specific request.
+John 15|What does remaining in his love involve?|Do one loving act.
+Romans 12|Which quality helps you most right now?|Practise it today.
+Galatians 6|Why keep doing good?|Do one good deed.
+Philippians 4|What guards your mind?|Think about one good thing.
+1 Thessalonians 5|Who could you encourage?|Reach out to someone.
+Hebrews 10|How can you help others at meetings?|Prepare a comment.
+Hebrews 6|How does God view your efforts?|Rest in that thought.
+Psalm 1|What marks a happy person?|Add one good habit.
+Psalm 19|What does creation teach?|Notice one thing in creation.
+Psalm 27|What helps you when you feel afraid?|Pray about it.
+Psalm 37|How can we handle frustration?|Let go of one grievance.
+Psalm 91|What protection does he offer?|Thank him for his care.
+Psalm 103|Which of his kindnesses stands out?|List three.
+Psalm 119:97-112|Why love his word?|Read slowly and note one line.
+Proverbs 3|How can you show trust?|Take one trusting step.
+Ecclesiastes 4|Why is companionship valuable?|Spend time with a friend.
+Matthew 5:1-12|Which qualities bring happiness?|Choose one to develop.
+Matthew 28:16-20|What did Jesus ask of his followers?|Plan one ministry step.
+Acts 1:1-14|What did the disciples do while waiting?|Pray with others.
+James 1|How can trials build endurance?|Ask for wisdom.
+1 Peter 5|What does he promise the humble?|Practise humility.
+Revelation 21:1-5|What future is promised?|Share hope with someone.`.split('\n');
+
+const TABS=['home','bible','enc','min','prog','more'];
+function show(t){if(!TABS.includes(t))t='home';TABS.forEach(x=>$('#'+x).classList.toggle('on',x===t));
+$$('nav button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.tab===t)));
+try{history.replaceState(null,'','#'+t)}catch(e){}scrollTo(0,0);if(t==='home')renderHome()}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+// ---------- Encouragement ----------
+const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/864e5);
+let eOff=S.g('eo_'+TD,0);
+const eIdx=()=>(doy+eOff)%E.length;
+function renderEnc(){const [r,f,a,p]=E[eIdx()].split('|');
+$('#eBox').innerHTML=`<h3>${esc(r)}</h3><p>${esc(f)}</p><p><b>Try this:</b> ${esc(a)}</p><p class="muted"><b>Prayer thought:</b> ${esc(p)}</p>`}
+$('#eNext').onclick=()=>{eOff++;S.s('eo_'+TD,eOff);renderEnc()};
+
+// ---------- Bible plan ----------
+let day=Math.min(30,Math.max(1,S.g('planDay',1)));
+function renderBible(){const [r,q,a]=R[day-1].split('|'),read=S.g('read',{});
+$('#bTitle').textContent=`Day ${day} of 30`;$('#bRef').textContent=r;$('#bQ').textContent=q;$('#bA').textContent=a;
+$('#bNote').value=S.g('bn_'+day,'');$('#bDone').textContent=read[day]?'Read ✓ (tap to undo)':'Mark as read';
+$('#bPrev').disabled=day<=1;$('#bNext').disabled=day>=30}
+function setDay(n){day=n;S.s('planDay',day);renderBible()}
+$('#bPrev').onclick=()=>setDay(day-1);$('#bNext').onclick=()=>setDay(day+1);
+$('#bSave').onclick=()=>{if(S.s('bn_'+day,$('#bNote').value))toast('Note saved on this device')};
+$('#bDone').onclick=()=>{const r=S.g('read',{});r[day]=!r[day];S.s('read',r);renderBible();if(r[day])toast('Well done. Take it at your own pace.')};
+
+// ---------- Progress ----------
+const PI=['Bible reading','Prayer','Congregation meeting attendance or preparation','Ministry','Personal study'];
+function checks(el,key,items,cb){const st=S.g(key,[]);
+el.innerHTML=items.map((t,i)=>`<label class="chk"><input type="checkbox" data-i="${i}" ${st[i]?'checked':''}>${esc(t)}</label>`).join('');
+el.onchange=e=>{st[+e.target.dataset.i]=e.target.checked;S.s(key,st);if(cb)cb()}}
+function pct(){const st=S.g('pg_'+TD,[]);return PI.filter((_,i)=>st[i]).length}
+function updProg(){const n=pct();let w=0;
+for(let i=0;i<7;i++){const d=new Date(now);d.setDate(now.getDate()-i);if(S.g('pg_'+iso(d),[]).some(Boolean))w++}
+const m=n===0?'A fresh page today. Start with one small step.':n<PI.length?`${n} of ${PI.length} done. Every step counts.`:'All done. Thank Jehovah for the strength to keep going.';
+$('#pBar').style.width=n/PI.length*100+'%';$('#pMsg').textContent=m;
+$('#pWeek').textContent=`You showed up on ${w} of the last 7 days. A missed day is just a chance to begin again.`;
+$('#hBar').style.width=n/PI.length*100+'%';$('#hProg').textContent=m}
+
+// ---------- Planner ----------
+if(S.g('ss',null)===null)S.s('ss',[{id:1,d:1,t:'18:00',m:30,n:'',sg:1},{id:2,d:3,t:'18:00',m:30,n:'',sg:1},{id:3,d:5,t:'09:00',m:30,n:'',sg:1}]);
+const sorted=()=>S.g('ss',[]).slice().sort((a,b)=>a.d-b.d||a.t.localeCompare(b.t));
+let editId=null;
+$('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
+$('#fDur').innerHTML=[10,15,20,30,45,60].map(m=>`<option value="${m}">${m} minutes</option>`).join('');
+$('#fDur').value='30';
+function renderSS(){const all=sorted();
+$('#sslist').innerHTML=DAYS.map((dn,i)=>{const l=all.filter(x=>x.d===i);
+return `<h4>${dn}</h4>`+(l.length?l.map(x=>`<div class="item"><span>${esc(x.t)}, ${x.m} minutes${x.sg?' (suggested)':''}${x.n?'<br><small>'+esc(x.n)+'</small>':''}</span><span><button class="alt" data-edit="${x.id}">Edit</button><button class="danger" data-del="${x.id}">Delete</button></span></div>`).join(''):'<p class="muted">Nothing planned.</p>')}).join('');
+$('#wSel').innerHTML=all.length?all.map(x=>`<option value="${x.id}">${DAYS[x.d]} at ${esc(x.t)}</option>`).join(''):'<option value="">Add a session first</option>'}
+function resetForm(){editId=null;$('#fTitle').textContent='Add a session';$('#fNote').value='';$('#fCancel').hidden=true}
+$('#sslist').onclick=e=>{const b=e.target.closest('button');if(!b)return;const all=S.g('ss',[]);
+if(b.dataset.del){if(confirm('Delete this session?')){S.s('ss',all.filter(x=>x.id!=b.dataset.del));renderSS();renderHome()}}
+if(b.dataset.edit){const x=all.find(y=>y.id==b.dataset.edit);if(!x)return;editId=x.id;$('#fDay').value=x.d;$('#fTime').value=x.t;$('#fDur').value=x.m;$('#fNote').value=x.n||'';
+$('#fTitle').textContent='Edit session';$('#fCancel').hidden=false;$('#fTitle').scrollIntoView({behavior:'smooth'})}};
+$('#fCancel').onclick=resetForm;
+$('#fSave').onclick=()=>{const t=$('#fTime').value;if(!t){toast('Please choose a start time.');return}
+const all=S.g('ss',[]),o={id:editId||Date.now(),d:+$('#fDay').value,t,m:+$('#fDur').value,n:$('#fNote').value.trim()};
+const i=all.findIndex(x=>x.id===editId);if(i>=0)all[i]=o;else all.push(o);
+if(S.s('ss',all)){toast('Session saved');resetForm();renderSS();renderHome()}};
+$('#wBtn').onclick=()=>{const x=S.g('ss',[]).find(y=>y.id==$('#wSel').value);if(!x){toast('Add a session first.');return}
+const txt=`Hello Brother, I would like to confirm our telephone witnessing session on ${DAYS[x.d]} at ${x.t} for about ${x.m} minutes. Does that time suit you?`;
+window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener')};
+
+// ---------- Home ----------
+function renderHome(){const [r,f,a]=E[eIdx()].split('|');
+$('#hVerse').innerHTML=`<p><b>${esc(r)}</b></p><p>${esc(f)}</p><p><b>Try this:</b> ${esc(a)}</p>`;
+$('#hBible').textContent=`Day ${day}: ${R[day-1].split('|')[0]}`;
+$('#hEnc').textContent=`${r}: ${f}`;
+const all=sorted(),nt=now.toTimeString().slice(0,5),nx=all.find(x=>x.d>dow||(x.d===dow&&x.t>=nt))||all[0];
+$('#hMin').textContent=nx?`Next planned: ${DAYS[nx.d]} at ${nx.t}, ${nx.m} minutes.`:'No sessions planned yet.';
+$('#hPray').textContent=PRAY}
+
+// ---------- Questions ----------
+function renderQ(){const q=S.g('qs',[]);$('#qList').innerHTML=q.length?q.map((x,i)=>`<div class="item"><span>${esc(x)}</span><button class="danger" data-q="${i}">Remove</button></div>`).join(''):'<p class="muted">No questions yet.</p>'}
+$('#qAdd').onclick=()=>{const v=$('#qIn').value.trim();if(!v)return;const q=S.g('qs',[]);q.push(v);S.s('qs',q);$('#qIn').value='';renderQ()};
+$('#qList').onclick=e=>{const b=e.target.closest('button');if(!b)return;const q=S.g('qs',[]);q.splice(+b.dataset.q,1);S.s('qs',q);renderQ()};
+
+// ---------- Auto-saved text fields ----------
+$$('[data-k]').forEach(el=>{const k=el.dataset.k.replace('@',WK+'_').replace('~',TD+'_');
+el.value=S.g(k,'');el.oninput=()=>S.s(k,el.value);el.onchange=()=>toast('Saved on this device')});
+
+// ---------- Reminders ----------
+const RL=[['t1','Morning Bible reading','05:30','Time for your morning Bible reading.'],['t2','Midday encouragement','12:30','Take a moment for today’s encouragement.'],['t3','Telephone witnessing','18:00','Time to prepare for telephone witnessing.'],['t4','Evening review','20:00','Time for your evening review and prayer.']];
+let rem=S.g('rem',{on:false,t:{}});
+RL.forEach(([id,,def])=>{const el=$('#'+id);el.value=rem.t[id]||def;el.onchange=()=>{rem.t[id]=el.value;S.s('rem',rem);toast('Reminder time saved')}});
+function remStatus(){const el=$('#remStatus');
+if(!('Notification' in window)){el.textContent='This browser does not support notifications. Please use Clock alarms.';return}
+const p=Notification.permission;
+el.textContent=p==='denied'?'Notifications are blocked in your browser settings. Please use Clock alarms.':rem.on&&p==='granted'?'Reminders are on. They work only while the app is open or running.':'Reminders are off.'}
+async function notify(title,body){try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+if(reg){await reg.showNotification(title,{body,icon:'icon-192.png'});return}new Notification(title,{body,icon:'icon-192.png'})}catch(e){toast('Could not show a notification.')}}
+$('#remOn').onclick=async()=>{if(!('Notification' in window)){remStatus();return}
+let p=Notification.permission;if(p==='default'){try{p=await Notification.requestPermission()}catch(e){}}
+rem.on=p==='granted';S.s('rem',rem);remStatus()};
+$('#remOff').onclick=()=>{rem.on=false;S.s('rem',rem);remStatus()};
+$('#remTest').onclick=()=>{if('Notification' in window&&Notification.permission==='granted')notify('Adjei’s Walk With Jehovah','This is a test reminder.');else toast('Turn on reminders and allow notifications first.')};
+const fired={};
+setInterval(()=>{if(!rem.on||!('Notification' in window)||Notification.permission!=='granted')return;
+const d=new Date(),hm=d.toTimeString().slice(0,5),day0=iso(d);
+RL.forEach(([id,label,def,msg])=>{const t=rem.t[id]||def,k=day0+id;if(t===hm&&!fired[k]){fired[k]=1;notify(label,msg)}})},20000);
+
+// ---------- Share, wipe, init ----------
+$('#share').onclick=async()=>{const u=location.href.split('#')[0];
+if(navigator.share){try{await navigator.share({title:'Adjei’s Walk With Jehovah',text:'A personal routine and encouragement app.',url:u});return}catch(e){if(e.name==='AbortError')return}}
+try{await navigator.clipboard.writeText(u);toast('Link copied')}catch(e){prompt('Copy this link:',u)}};
+$('#wipe').onclick=()=>{if(!confirm('Erase all notes, goals and schedule on this device?'))return;
+try{Object.keys(localStorage).filter(k=>k.startsWith('wwj_')).forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()};
+
+$('#date').textContent=now.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+$('#welcome').textContent=MSG[dow];
+renderEnc();renderBible();renderSS();renderQ();
+checks($('#pList'),'pg_'+TD,PI,updProg);
+checks($('#prep'),'prep_'+TD,['Pray for Jehovah’s direction','Choose a Bible thought','Prepare a friendly greeting','Review the arrangement with the accompanying brother']);
+updProg();remStatus();
+show(location.hash.slice(1));
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').catch(()=>{}));
+</script>
+</body>
+</html>
